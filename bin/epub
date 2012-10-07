@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'optparse'
+
+begin
+  require 'epub'
+rescue LoadError
+  $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+  require 'epub'
+end
+
+ARGV.options do |opt|
+  opt.banner = "Usage: #$0 [options]"
+  opt.on("--version", "-v", "Version number") do
+    puts "v%s" % Epub::VERSION
+    exit
+  end
+
+  # Parse the command line args
+  opt.parse!
+end
+
+trap("INT") {
+  puts; # Here to stop ^C appearing on the same line.
+  exit
+}
