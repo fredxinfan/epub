@@ -46,19 +46,15 @@ module Epub
       @epub.save_opf!(doc, OPF_XPATH)
     end
 
+    def xmldoc
+      @epub.opf_xml.xpath(OPF_XPATH).first
+    end
 
-    private
-
-
-      def xmldoc
-        @epub.opf_xml.xpath(OPF_XPATH).first
+    def nodes
+      xmldoc.xpath(OPF_ITEM_XPATH).each do |node|
+        yield(node)
       end
-
-      def nodes
-        xmldoc.xpath(OPF_ITEM_XPATH).each do |node|
-          yield(node)
-        end
-      end
+    end
 
   end
 end

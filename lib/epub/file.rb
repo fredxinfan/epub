@@ -3,11 +3,8 @@ module Epub
     include Logger
 
     # @private
-    XML_NS = {
-      'xmlns' => 'http://www.idpf.org/2007/opf'
-    }
+    XML_NS = Metadata::XML_NS
 
-    # @private
     attr_accessor :file
 
     # @param [String] path to an epub file, path can be either:
@@ -35,7 +32,7 @@ module Epub
     # @overload extract(filepath)
     #   Unzips an Epub and Rezips it after the block exits
     #   @param [String] path to the Epub
-    #   @yield [Epub::File, epub_filepath] 
+    #   @yield [Epub::File, epub_filepath]
     # @overload extract(filepath, extract_path)
     #   @param [String] path to the Epub
     #   @param [String] directory path to extract to
@@ -170,7 +167,7 @@ module Epub
         # prefix
         doc_partial = Nokogiri::XML(doc_partial.to_s)
         node.replace(doc_partial.root)
-        
+
         data = doc.to_s
         f.puts data
 
@@ -247,8 +244,8 @@ END
 
       content_opf = <<END
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookID" version="2.0">
-    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+<package xmlns="#{XML_NS['xmlns']}" unique-identifier="BookID" version="2.0">
+    <metadata xmlns:dc="#{XML_NS['dc']}" xmlns:opf="#{XML_NS['xmlns']}">
     </metadata>
     <manifest></manifest>
     <spine toc="ncx"></spine>

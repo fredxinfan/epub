@@ -8,8 +8,8 @@ module Epub
 
 
     def self.unzip(zip_filepath, dirpath)
-      Zip::ZipFile.open(zip_filepath) do |zf|
-        zf.each do |e| 
+      Zip::File.open(zip_filepath) do |zf|
+        zf.each do |e|
           fpath = ::File.join(dirpath, e.name)
           FileUtils.mkdir_p ::File.dirname(fpath)
 
@@ -34,7 +34,7 @@ module Epub
       begin
         # Create the new zip
         # NOTE: This overides the zip file
-        Zip::ZipFile::open(zip_filepath, true) do |zf|
+        Zip::File::open(zip_filepath, true) do |zf|
           Dir["#{dirpath}/**/*"].each do |f|
             pn_f       = Pathname.new(f)
             pn_dirpath = Pathname.new(dirpath)
@@ -57,12 +57,11 @@ module Epub
     # Open a file in the Epub
     #
     # @param [String] filepath in the Epub
-    # @yield [Zip::ZipFileSystem::ZipFsFile] file system zip file
+    # @yield [Zip::Entry] file system zip file
     def open(filepath)
       zip_open do |zip|
-        zip.file.open(filepath, "r") do |file|
-          yield(file)
-        end
+        entries = zip.entries.inject({}) {|h, entry| h[entry.name] = entry; h}
+        yield(entries[filepath].get_input_stream)
       end
     end
 
@@ -125,10 +124,10 @@ module Epub
 
     # Iterates over each file in the Epub
     #
-    # @param [Symbol] type of entry to return, can be `:file` or `:directory`. 
+    # @param [Symbol] type of entry to return, can be `:file` or `:directory`.
     #                 A nil value will return both
     def each(type=nil)
-      Zip::ZipFile.foreach(@filepath) do |entry|
+      Zip::File.foreach(@filepath) do |entry|
         file_type = entry.file? ? :file : :directory
 
         case type
@@ -146,7 +145,7 @@ module Epub
 
     # Removes any empty directorys in the epub
     def clean_empty_dirs!
-      Zip::ZipFile.foreach(@filepath) do |entry|
+      Zip::File.foreach(@filepath) do |entry|
         if entry.directory?
           zip_open do |zip|
             is_empty = false
@@ -164,7 +163,7 @@ module Epub
     end
 
 
-    # 
+    #
     # Read a file from the epub
     #
     # @param [String] filepath to a file in the epub zip
@@ -213,9 +212,9 @@ module Epub
 
       # Opens the zip file
       #
-      # @yield [Zip::ZipFile] zip file
+      # @yield [Zip::File] zip file
       def zip_open
-        Zip::ZipFile.open(@filepath, true) do |zip|
+        Zip::File.open(@filepath, true) do |zip|
           yield(zip)
         end
       end

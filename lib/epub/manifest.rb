@@ -13,9 +13,7 @@ module Epub
     OPF_ITEM_XPATH  = '//xmlns:item[@id="%s"]'
 
     # @private
-    XML_NS = {
-      'xmlns' => 'http://www.idpf.org/2007/opf'
-    }
+    XML_NS = Metadata::XML_NS
 
     def initialize(epub)
       @epub = epub
@@ -25,10 +23,10 @@ module Epub
     def reload_xmldoc
       @xmldoc = @epub.opf_xml.xpath(OPF_XPATH, 'xmlns' => XML_NS['xmlns'])
     end
-    
+
 
     # Normalizes the manifest by flattening the file paths
-    # 
+    #
     # @see Epub::File#normalize!
     def normalize!
       # Flatten epub items
@@ -76,7 +74,7 @@ module Epub
       items :image
     end
 
-    
+
     def html
       items :html
     end
@@ -121,7 +119,7 @@ module Epub
 
     # Access item by id, for example `epub.manifest["cover-image"]` will grab the file for
     # the following XML entry
-    # 
+    #
     #     <item id="cover-image" href="OEBPS/assets/cover.jpg" media-type="image/jpeg"/>
     #
     def [](key)
@@ -248,16 +246,13 @@ module Epub
       item_for_path(path)
     end
 
-
+    def nodes
+      @xmldoc.xpath(OPF_ITEMS_XPATH).each do |node|
+        yield(node)
+      end
+    end
 
     private
-
-      def nodes
-        @xmldoc.xpath(OPF_ITEMS_XPATH).each do |node|
-          yield(node)
-        end
-      end
-
 
       def node_for_path(path)
         nodes do |node|
@@ -281,7 +276,7 @@ module Epub
           nil
         end
       end
-      
+
 
       def item_class_from_path(path)
         case path

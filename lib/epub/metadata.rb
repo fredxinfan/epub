@@ -60,7 +60,7 @@ module Epub
 
       # Error if not a valid metadata entry
       raise "#{k} not valid" if !obj
-      
+
       xpath = "//#{obj[:node]}"
       node = doc.xpath(xpath, 'dc' => XML_NS['dc']).first
 
@@ -94,7 +94,7 @@ module Epub
     end
 
 
-    # 
+    #
     def to_s
       out = []
       XMLDEF.each do |k,v|
